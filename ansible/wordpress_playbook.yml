@@ -1,0 +1,8 @@
+---
+- name: Mount EFS and install wordpress
+  hosts: wordpress
+  roles:
+    - {role: nfs}
+    - {role: install_php_fpm}
+    - {role: wordpress_prep}
+    - {role: wordpress_cli}

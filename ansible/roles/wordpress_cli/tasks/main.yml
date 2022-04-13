@@ -1,0 +1,33 @@
+---
+- name: Download CLI for WordPress
+  ansible.builtin.get_url:
+    url: "{{ wp_cli.url }}"
+    dest: "/tmp/wp-cli.phar"
+    mode: 0744
+
+- name: Move CLI for WordPress to use as command
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    mode: a+x
+    src: "/tmp/wp-cli.phar"
+    dest: "/usr/local/bin/wp"
+
+- name: Install setfacl support for enabling become_user www-data
+  become: true
+  ansible.builtin.package:
+    name:
+      - acl
+    state: present
+
+- name: WordPress installation
+  become: true
+  become_user: www-data
+  ansible.builtin.command:
+    "wp core install --path={{ wpdirectory }}
+    --url={{ elb.dns }}
+    --title={{ wp_cli.title }} --admin_user={{ wp_cli.admin }}
+    --admin_email={{ wp_cli.admin_email }}
+    --admin_password={{ wp_cli.admin_password }}"
+  changed_when: false
+  when: instance.main

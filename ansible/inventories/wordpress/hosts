@@ -1,0 +1,3 @@
+[wordpress]
+wordpress0 ansible_host=18.197.68.236 ansible_user=ubuntu ansible_connection=ssh 
+wordpress1 ansible_host=3.120.132.52 ansible_user=ubuntu ansible_connection=ssh 

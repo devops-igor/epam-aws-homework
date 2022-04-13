@@ -1,0 +1,24 @@
+---
+- name: Install nfs-common
+  become: true
+  ansible.builtin.apt:
+    pkg:
+      - nfs-common
+
+- name: Ensure mount directory exists
+  become: true
+  ansible.builtin.file:
+    owner: www-data
+    group: www-data
+    path: "/var/www/wordpress/wp-content/"
+    state: directory
+    mode: 0755
+
+- name: Mount EFS volume
+  become: true
+  ansible.builtin.mount:
+    name: "/var/www/wordpress/wp-content/"
+    src: "{{ efs.dns }}"
+    fstype: nfs4
+    opts: nfsvers=4.1
+    state: mounted

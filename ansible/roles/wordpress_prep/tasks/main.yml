@@ -1,0 +1,74 @@
+---
+- name: Remove default nginx config
+  become: true
+  ansible.builtin.file:
+    path: /etc/nginx/sites-available/default
+    state: absent
+
+- name: Remove default link nginx config
+  become: true
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Install wordpress nginx configuration
+  become: true
+  ansible.builtin.template:
+    src: templates/wordpress.conf.j2
+    dest: /etc/nginx/sites-available/wordpress.conf
+    mode: 0644
+
+- name: Add the directive in order for Nginx to correctly serve PHP
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/nginx/fastcgi_params
+    line: fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+    state: present
+
+- name: Activate site configuration
+  become: true
+  ansible.builtin.file:
+    src: '/etc/nginx/sites-available/wordpress.conf'
+    dest: '/etc/nginx/sites-enabled/wordpress.conf'
+    state: 'link'
+
+- name: Restart nginx
+  become: true
+  ansible.builtin.systemd:
+    name: "nginx"
+    state: restarted
+
+- name: Download WordPress
+  ansible.builtin.get_url:
+    url: "{{ download_url }}"
+    dest: "/tmp/latest.tar.gz"
+    mode: 0750
+
+- name: Unpack WordPress installation on main instance
+  become: true
+  ansible.builtin.unarchive:
+    copy: false
+    owner: www-data
+    group: www-data
+    src: /tmp/latest.tar.gz
+    dest: "{{ wpdirectory.unpack }}"
+  when: instance.main
+
+- name: Unpack WordPress installation on other instances
+  become: true
+  ansible.builtin.unarchive:
+    copy: false
+    owner: www-data
+    group: www-data
+    src: /tmp/latest.tar.gz
+    dest: "{{ wpdirectory.unpack }}"
+  when: not instance.main
+
+- name: Load wp-config.php
+  become: true
+  ansible.builtin.template:
+    src: templates/wp-config.php.j2
+    dest: "{{ wpdirectory.root }}/wp-config.php"
+    mode: 0640
+    owner: www-data
+    group: www-data

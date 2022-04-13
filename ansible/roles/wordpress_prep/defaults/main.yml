@@ -1,0 +1,7 @@
+---
+download_url: "http://wordpress.org/latest.tar.gz"
+wpdirectory:
+  unpack: "/var/www/"
+  root: "/var/www/wordpress/"
+nginx:
+  port: 80

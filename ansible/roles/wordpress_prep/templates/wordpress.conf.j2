@@ -1,0 +1,27 @@
+server {
+  listen {{ nginx.port }} default_server;
+  add_header Set-Cookie chost={{ ansible_host }};
+  root {{ wpdirectory.root }};
+  index index.php index.html index.htm;
+
+  server_name _;
+
+  location / {
+      try_files $uri $uri/ /index.php?$args;
+  }
+
+
+  error_page 500 502 503 504 /50x.html;
+  location = /50x.html {
+    root /usr/share/nginx/www;
+  }
+
+  # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+    fastcgi_index index.php;
+    include fastcgi_params;
+  }
+}

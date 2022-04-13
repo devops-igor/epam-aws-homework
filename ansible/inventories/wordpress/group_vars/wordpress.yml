@@ -1,0 +1,12 @@
+---
+nginx:
+  port: 80
+db:
+  name: "wordpress"
+  user: "wordpress"
+  password: "wordpress"
+  endpoint: "aws-homework-rds.cyivvsklcv5h.eu-central-1.rds.amazonaws.com:3306"
+efs:
+  dns: "fs-0dde4fd1868a4685e.efs.eu-central-1.amazonaws.com:/"
+elb:
+  dns: "aws-homework-lb-168203590.eu-central-1.elb.amazonaws.com"

@@ -1,0 +1,29 @@
+---
+- name: Install nginx and php
+  become: true
+  ansible.builtin.apt:
+    pkg:
+      - "{{ item }}"
+  with_items:
+    - nginx
+    - php-fpm
+    - php-mysql
+    - php-xml
+    - php-xmlrpc
+    - php-curl
+    - php-gd
+    - php-imagick
+    - php-cli
+    - php-imap
+    - php-mbstring
+    - php-opcache
+    - php-redis
+    - php-soap
+    - php-zip
+
+- name: Start, enable webserver service and ensure it is not masked
+  ansible.builtin.systemd:
+    name: php7.4-fpm
+    enabled: true
+    state: started
+    masked: false
